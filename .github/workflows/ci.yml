@@ -1,17 +1,14 @@
 name: Sail RISCV Build and Test
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          repository: 'rpsene/sail-riscv'
-          ref: 'main'
+      - name: Clone sail-riscv repository
+        run: git clone https://github.com/rpsene/sail-riscv
 
       - name: Run Sail Base Image and Build CSIM for RV32 and RV64
         run: |
