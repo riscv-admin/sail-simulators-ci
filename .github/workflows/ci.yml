@@ -1,0 +1,28 @@
+name: Sail RISCV Build and Test
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: 'rpsene/sail-riscv'
+          ref: 'main'
+
+      - name: Run Sail Base Image and Build CSIM for RV32 and RV64
+        run: |
+          docker run -it --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && sail && ARCH=RV32 ENABLE_STATIC=1 make csim && ARCH=RV64 ENABLE_STATIC=1 make csim"
+
+      - name: Run Tests
+        run: |
+          docker run -it --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && ./test/run_tests.sh"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: sail-riscv/test/*.xml
