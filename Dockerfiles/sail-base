@@ -1,0 +1,39 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    DEBIAN_FRONTEND="noninteractive" apt-get install -y \
+    opam \
+    build-essential \
+    device-tree-compiler \
+    libgmp-dev \
+    z3 \
+    pkg-config \
+    zlib1g-dev \
+    sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure sudoers for the 'opam' user without requiring a password
+RUN mkdir -p /etc/sudoers.d/ && \
+    echo 'opam ALL=(ALL:ALL) NOPASSWD:ALL' > /etc/sudoers.d/opam && \
+    chmod 440 /etc/sudoers.d/opam && \
+    chown root:root /etc/sudoers.d/opam
+
+# Create and configure the 'opam' user
+RUN adduser --disabled-password --gecos '' opam && \
+    passwd -l opam && \
+    chown -R opam:opam /home/opam
+
+# Switch to the 'opam' user
+USER opam
+ENV HOME /home/opam
+
+# Initialize opam and install packages
+RUN opam init --disable-sandboxing --auto-setup && \
+    eval $(opam env) && \
+    opam repository add rems https://github.com/rems-project/opam-repository.git && \
+    opam install -y sail
+
+# Set the work directory to /data
+WORKDIR /data
