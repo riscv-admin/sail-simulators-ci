@@ -12,11 +12,11 @@ jobs:
 
       - name: Run Sail Base Image and Build CSIM for RV32 and RV64
         run: |
-          docker run -it --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && sail && ARCH=RV32 ENABLE_STATIC=1 make csim && ARCH=RV64 ENABLE_STATIC=1 make csim"
+          docker run --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && sail && ARCH=RV32 ENABLE_STATIC=1 make csim && ARCH=RV64 ENABLE_STATIC=1 make csim"
 
       - name: Run Tests
         run: |
-          docker run -it --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && ./test/run_tests.sh"
+          docker run --rm -v ${{ github.workspace }}/sail-riscv:/data riscvintl/sail-base-image:latest /bin/bash -c "eval \$(opam env) && ./test/run_tests.sh"
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
